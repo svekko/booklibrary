@@ -1,11 +1,13 @@
 package ee.svekko.booklibrary.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+public interface BookResponseDto {
+    int getId();
 
-@Getter
-@Builder
-public class BookResponseDto {
-    private int id;
-    private String title;
+    String getTitle();
+
+    Integer getStatusId();
+
+    String getStatusName();
+
+    Integer getBookUsedById();
 }

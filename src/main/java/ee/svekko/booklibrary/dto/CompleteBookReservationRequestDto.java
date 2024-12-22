@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CompleteBookReservationRequestDto {
-    private int reservedToAccountId;
+    private Integer reservedToAccountId;
 }

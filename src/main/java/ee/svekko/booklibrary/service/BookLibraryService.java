@@ -29,17 +29,7 @@ public class BookLibraryService {
     private final BookLibraryConfig bookLibraryConfig;
 
     public List<BookResponseDto> getBooks() {
-        return bookChangeRepository.getBooks()
-            .stream()
-            .map(BookChange::toBookResponseDto)
-            .toList();
-    }
-
-    public List<BookResponseDto> getOwnBooks(UserAccount userAccount) {
-        return bookChangeRepository.getBooksWhereChangedBy(userAccount.getId())
-            .stream()
-            .map(BookChange::toBookResponseDto)
-            .toList();
+        return bookChangeRepository.getBooks();
     }
 
     @Transactional
@@ -115,8 +105,12 @@ public class BookLibraryService {
             .orElseThrow(EntityNotFoundException::new);
 
         UserAccount reservedTo = UserAccount.builder()
-            .id(requestDto != null ? requestDto.getReservedToAccountId() : userAccount.getId())
+            .id(userAccount.getId())
             .build();
+
+        if (requestDto != null && requestDto.getReservedToAccountId() != null) {
+            reservedTo.setId(requestDto.getReservedToAccountId());
+        }
 
         if (!BookStatusValue.RESERVED.equals(bookStatusChg.getBookStatus())) {
             throw new BookActionException(BookActionException.Error.BOOK_NOT_RESERVED);

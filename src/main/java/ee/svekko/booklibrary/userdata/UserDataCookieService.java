@@ -40,6 +40,7 @@ public class UserDataCookieService {
             UserAccount userAccount = userAccountRepository.findById(userSession.id()).orElse(null);
             if (userAccount != null) {
                 return UserAccountResponseDto.builder()
+                    .id(userAccount.getId())
                     .email(userAccount.getEmail())
                     .authenticated(true)
                     .build();

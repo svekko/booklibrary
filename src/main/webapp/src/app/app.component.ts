@@ -3,7 +3,9 @@ import { Component, OnInit, inject } from "@angular/core";
 import { Router, RouterOutlet } from "@angular/router";
 import { CookieService } from "ngx-cookie-service";
 import { AlertComponent } from "./alert/alert.component";
-import { AppService, UserInfo } from "./app.service";
+import { AppService } from "./app.service";
+import { UserInfo } from "./model/user-info.dto";
+import { UserService } from "./user/user.service";
 
 @Component({
   selector: "app-root",
@@ -15,19 +17,20 @@ import { AppService, UserInfo } from "./app.service";
 
 export class AppComponent implements OnInit {
   title = "webapp";
-  userInfo: UserInfo | null = null;
 
   private appService = inject(AppService);
   private cookieService = inject(CookieService);
   private router = inject(Router);
 
+  userService = inject(UserService);
+
   ngOnInit(): void {
     const userDataCookie = this.cookieService.get("user-data");
 
     if (userDataCookie) {
-      const userData = JSON.parse(atob(userDataCookie));
+      const userData = JSON.parse(atob(userDataCookie)) as UserInfo;
       if (userData?.authenticated) {
-        this.userInfo = { email: userData.email };
+        this.userService.setUserInfo(userData);
         this.router.navigateByUrl("/books");
         return;
       }

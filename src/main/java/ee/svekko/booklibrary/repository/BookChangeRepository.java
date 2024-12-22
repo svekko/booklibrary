@@ -1,5 +1,6 @@
 package ee.svekko.booklibrary.repository;
 
+import ee.svekko.booklibrary.dto.BookResponseDto;
 import ee.svekko.booklibrary.model.BookChange;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -25,23 +26,22 @@ public interface BookChangeRepository extends CrudRepository<BookChange, Integer
     @Query(
         nativeQuery = true,
         value = """
-            SELECT *
+            SELECT book_change.*,
+                   book_status.id AS status_id,
+                   book_status.name AS status_name,
+                   book_status_change.book_used_by_id AS book_used_by_id
             FROM book_change
-            WHERE valid_from <= now()
-            AND valid_to > now()
+            LEFT JOIN book_status_change ON (
+                book_status_change.book_id = book_change.book_id
+                AND book_status_change.valid_from <= now()
+                AND book_status_change.valid_to > now()
+            )
+            LEFT JOIN book_status ON (
+                book_status.id = book_status_change.book_status_id
+            )
+            WHERE book_change.valid_from <= now()
+            AND book_change.valid_to > now()
             """
     )
-    List<BookChange> getBooks();
-
-    @Query(
-        nativeQuery = true,
-        value = """
-            SELECT *
-            FROM book_change
-            WHERE changed_by_id = :changedById
-            AND valid_from <= now()
-            AND valid_to > now()
-            """
-    )
-    List<BookChange> getBooksWhereChangedBy(int changedById);
+    List<BookResponseDto> getBooks();
 }

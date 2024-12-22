@@ -1,6 +1,5 @@
 package ee.svekko.booklibrary.model;
 
-import ee.svekko.booklibrary.dto.BookResponseDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,11 +36,4 @@ public class BookChange {
 
     @Column(name = "valid_to")
     private LocalDateTime validTo;
-
-    public BookResponseDto toBookResponseDto() {
-        return BookResponseDto.builder()
-            .id(book.getId())
-            .title(title)
-            .build();
-    }
 }

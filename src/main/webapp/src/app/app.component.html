@@ -1,8 +1,8 @@
 <main class="main">
   <div class="content">
-    <div *ngIf="userInfo" class="toolbar-container">
+    <div *ngIf="userService.getUserInfo().authenticated" class="toolbar-container">
       <div class="toolbar">
-        <p class="user-data">{{userInfo.email}}</p>
+        <p class="user-data">{{userService.getUserInfo().email}}</p>
         <button (click)="logout()">Logout</button>
       </div>
     </div>

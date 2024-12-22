@@ -20,12 +20,6 @@ public class BookLibraryController {
         return bookLibraryService.getBooks();
     }
 
-    @GetMapping("/own-books")
-    public List<BookResponseDto> getOwnBooks() {
-        UserAccount userAccount = UserAccount.fromSecurityContext();
-        return bookLibraryService.getOwnBooks(userAccount);
-    }
-
     @PostMapping("/books")
     public void addBook(@RequestBody AddBookRequestDto requestDto) {
         UserAccount userAccount = UserAccount.fromSecurityContext();
