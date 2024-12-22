@@ -1,5 +1,6 @@
 package ee.svekko.booklibrary.service;
 
+import ee.svekko.booklibrary.config.BookLibraryConfig;
 import ee.svekko.booklibrary.dto.AddBookRequestDto;
 import ee.svekko.booklibrary.dto.BookResponseDto;
 import ee.svekko.booklibrary.dto.CompleteBookReservationRequestDto;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -24,6 +26,7 @@ public class BookLibraryService {
     private final BookStatusChangeRepository bookStatusChangeRepository;
     private final BookChangeRepository bookChangeRepository;
     private final BookRepository bookRepository;
+    private final BookLibraryConfig bookLibraryConfig;
 
     public List<BookResponseDto> getBooks() {
         return bookChangeRepository.getBooks()
@@ -87,7 +90,8 @@ public class BookLibraryService {
             throw new BookActionException(BookActionException.Error.BOOK_NOT_AVAILABLE);
         }
 
-        addBookStatus(bookId, BookStatusValue.RESERVED, userAccount, userAccount);
+        LocalDateTime validTo = LocalDateTime.now().plus(bookLibraryConfig.getBookHoursReserved(), ChronoUnit.HOURS);
+        addBookStatus(bookId, BookStatusValue.RESERVED, userAccount, userAccount, validTo);
     }
 
     @Transactional
@@ -100,7 +104,8 @@ public class BookLibraryService {
             throw new BookActionException(BookActionException.Error.BOOK_NOT_AVAILABLE);
         }
 
-        addBookStatus(bookId, BookStatusValue.BORROWED, userAccount, userAccount);
+        LocalDateTime validTo = LocalDateTime.now().plus(bookLibraryConfig.getBookDaysBorrowed(), ChronoUnit.DAYS);
+        addBookStatus(bookId, BookStatusValue.BORROWED, userAccount, userAccount, validTo);
     }
 
     @Transactional
@@ -122,6 +127,7 @@ public class BookLibraryService {
         }
 
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime validTo = now.plus(bookLibraryConfig.getBookDaysBorrowed(), ChronoUnit.DAYS);
 
         bookStatusChg.setValidTo(now);
         bookStatusChangeRepository.save(bookStatusChg);
@@ -132,7 +138,7 @@ public class BookLibraryService {
             .bookUsedBy(reservedTo)
             .changedBy(userAccount)
             .validFrom(now)
-            .validTo(TimeUtil.maxDateTime())
+            .validTo(validTo)
             .build());
     }
 
@@ -182,7 +188,7 @@ public class BookLibraryService {
         return bookChg.getChangedBy().getId().equals(userAccount.getId());
     }
 
-    private void addBookStatus(int bookId, BookStatusValue newStatus, UserAccount bookUsedBy, UserAccount changedBy) {
+    private void addBookStatus(int bookId, BookStatusValue newStatus, UserAccount bookUsedBy, UserAccount changedBy, LocalDateTime validTo) {
         BookChange bookChg = bookChangeRepository
             .getBookByBookId(bookId)
             .orElseThrow(EntityNotFoundException::new);
@@ -193,7 +199,7 @@ public class BookLibraryService {
             .bookUsedBy(bookUsedBy)
             .changedBy(changedBy)
             .validFrom(LocalDateTime.now())
-            .validTo(TimeUtil.maxDateTime())
+            .validTo(validTo)
             .build());
     }
 
