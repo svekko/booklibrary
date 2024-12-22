@@ -1,0 +1,19 @@
+.toolbar-container {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+.toolbar {
+    padding: 0.5rem;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    background-color: #eeeeee;
+    border-bottom: 1px solid #dddddd;
+
+    > p.user-data {
+        margin: 0 1rem 0 0;
+    }
+}

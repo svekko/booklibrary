@@ -24,11 +24,11 @@ public class AuthManager implements AuthenticationManager {
         UserAccount userAccount = userAccountRepository.findByEmail(email);
 
         if (userAccount == null) {
-            throw new BadCredentialsException("userNotFound");
+            throw new BadCredentialsException("User not found");
         }
 
         if (!encoder.matches(password, userAccount.getPassword())) {
-            throw new BadCredentialsException("invalidPassword");
+            throw new BadCredentialsException("Invalid password");
         }
 
         UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.authenticated(

@@ -1,0 +1,13 @@
+.alert {
+    padding: 0.5rem 1rem;
+    background-color: #eeeeee;
+    border-radius: 3px;
+    border: 1px solid #dddddd;
+    margin-bottom: 1rem;
+}
+
+.alert.alert-error {
+    background-color: #f7bcbc;
+    border: 1px solid #610808;
+    color: #610808;
+}

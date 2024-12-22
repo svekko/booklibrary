@@ -15,13 +15,13 @@ public class BookActionException extends RuntimeException {
     @AllArgsConstructor
     @Getter
     public enum Error {
-        BOOK_NOT_RESERVED("bookNotReserved"),
-        BOOK_NOT_BORROWED("bookNotBorrowed"),
-        BOOK_NOT_AVAILABLE("bookNotAvailable"),
-        BOOK_RESERVED_FOR_SOMEONE_ELSE("bookReservedForSomeoneElse"),
-        BOOK_BORROWED_BY_SOMEONE_ELSE("bookBorrowedBySomeoneElse"),
-        NOT_OWN_BOOK("notOwnBook"),
-        CAN_COMPLETE_ONLY_OWN_BOOK_RESERVATION("canCompleteOnlyOwnBookReservation");
+        BOOK_NOT_RESERVED("Book not reserved"),
+        BOOK_NOT_BORROWED("Book not borrowed"),
+        BOOK_NOT_AVAILABLE("Book not available"),
+        BOOK_RESERVED_FOR_SOMEONE_ELSE("Book reserved for someone else"),
+        BOOK_BORROWED_BY_SOMEONE_ELSE("Book borrowed by someone else"),
+        NOT_OWN_BOOK("Not own book"),
+        CAN_COMPLETE_ONLY_OWN_BOOK_RESERVATION("Can complete only own book reservation");
 
         private final String message;
     }

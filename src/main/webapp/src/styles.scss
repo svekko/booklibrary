@@ -1,1 +1,62 @@
-/* You can add global styles to this file, and also import other style files */
+main {
+    font-family: 'Verdana', sans-serif;
+    display: flex;
+    justify-content: center;
+    margin-top: 75px;
+}
+
+button, input, select {
+    font-size: 1em;
+}
+
+button {
+    padding: 0.25rem 1rem;
+}
+
+input, select {
+    padding: 0.25rem;
+}
+
+.input-error {
+    color: #be1f1f;
+    font-size: 0.85em;
+}
+
+.title {
+    font-size: 1.45em;
+    font-weight: bold;
+    margin: 0 0 1rem 0;
+}
+
+.input-controls {
+    padding: 0.25rem;
+    margin: 0 0 1rem 0;
+}
+
+.input-controls > label {
+    margin: 0 0.25rem 0 0;
+    min-width: 125px;
+    display: inline-block;
+}
+
+.input-controls > input[type="checkbox"] ~ label {
+    margin-left: 0.25rem;
+}
+
+.input-controls > select {
+    min-width: 225px;
+}
+
+.center-container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.center-container > .form {
+    padding: 1rem;
+    background-color: #eeeeee;
+    border-radius: 3px;
+    border: 1px solid #dddddd;
+    display: inline-block;
+}

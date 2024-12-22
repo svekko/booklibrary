@@ -31,14 +31,14 @@ public class ExceptionController {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<JsonResponseDto> handleEntityNotFoundException(EntityNotFoundException e) {
-        JsonResponseDto responseDto = JsonResponseDto.error("notFound");
+        JsonResponseDto responseDto = JsonResponseDto.error("Not found");
         return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<JsonResponseDto> handleException(Exception e) {
         log.error(e.getMessage());
-        JsonResponseDto responseDto = JsonResponseDto.error("systemError");
+        JsonResponseDto responseDto = JsonResponseDto.error("System error");
         return new ResponseEntity<>(responseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
