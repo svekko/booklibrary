@@ -32,10 +32,6 @@ public class BookStatusChange {
     @JoinColumn(name = "book_used_by_id")
     private UserAccount bookUsedBy;
 
-    @ManyToOne
-    @JoinColumn(name = "changed_by_id")
-    private UserAccount changedBy;
-
     @Column(name = "valid_from")
     private LocalDateTime validFrom;
 

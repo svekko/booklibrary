@@ -28,8 +28,8 @@ public class BookChange {
     private Book book;
 
     @ManyToOne
-    @JoinColumn(name = "changed_by_id")
-    private UserAccount changedBy;
+    @JoinColumn(name = "created_by_id")
+    private UserAccount createdBy;
 
     @Column(name = "valid_from")
     private LocalDateTime validFrom;

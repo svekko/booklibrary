@@ -3,7 +3,6 @@ package ee.svekko.booklibrary.service;
 import ee.svekko.booklibrary.config.BookLibraryConfig;
 import ee.svekko.booklibrary.dto.AddBookRequestDto;
 import ee.svekko.booklibrary.dto.BookResponseDto;
-import ee.svekko.booklibrary.dto.CompleteBookReservationRequestDto;
 import ee.svekko.booklibrary.exception.BookActionException;
 import ee.svekko.booklibrary.model.*;
 import ee.svekko.booklibrary.repository.BookChangeRepository;
@@ -12,7 +11,6 @@ import ee.svekko.booklibrary.repository.BookStatusChangeRepository;
 import ee.svekko.booklibrary.util.TimeUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +38,7 @@ public class BookLibraryService {
         bookChangeRepository.save(BookChange.builder()
             .book(book)
             .title(requestDto.getTitle())
-            .changedBy(userAccount)
+            .createdBy(userAccount)
             .validFrom(LocalDateTime.now())
             .validTo(TimeUtil.maxDateTime())
             .build());
@@ -52,7 +50,7 @@ public class BookLibraryService {
             .getBookByBookId(bookId)
             .orElseThrow(EntityNotFoundException::new);
 
-        if (!bookChg.getChangedBy().getId().equals(userAccount.getId())) {
+        if (!bookChg.getCreatedBy().getId().equals(userAccount.getId())) {
             throw new BookActionException(BookActionException.Error.NOT_OWN_BOOK);
         }
 
@@ -64,7 +62,7 @@ public class BookLibraryService {
         bookChangeRepository.save(BookChange.builder()
             .book(bookChg.getBook())
             .title(bookChg.getTitle())
-            .changedBy(userAccount)
+            .createdBy(userAccount)
             .validFrom(now)
             .validTo(now)
             .build());
@@ -99,24 +97,16 @@ public class BookLibraryService {
     }
 
     @Transactional
-    public void completeBookReservation(UserAccount userAccount, @Nullable CompleteBookReservationRequestDto requestDto, int bookId) {
+    public void completeBookReservation(UserAccount userAccount, int bookId) {
         BookStatusChange bookStatusChg = bookStatusChangeRepository
             .findValidBookStatusChangeByBookId(bookId)
             .orElseThrow(EntityNotFoundException::new);
-
-        UserAccount reservedTo = UserAccount.builder()
-            .id(userAccount.getId())
-            .build();
-
-        if (requestDto != null && requestDto.getReservedToAccountId() != null) {
-            reservedTo.setId(requestDto.getReservedToAccountId());
-        }
 
         if (!BookStatusValue.RESERVED.equals(bookStatusChg.getBookStatus())) {
             throw new BookActionException(BookActionException.Error.BOOK_NOT_RESERVED);
         }
 
-        if (!userAccount.getId().equals(reservedTo.getId()) && !isOwnBook(userAccount, bookId)) {
+        if (!userAccount.getId().equals(bookStatusChg.getBookUsedBy().getId()) && !isOwnBook(userAccount, bookId)) {
             throw new BookActionException(BookActionException.Error.CAN_COMPLETE_ONLY_OWN_BOOK_RESERVATION);
         }
 
@@ -129,8 +119,7 @@ public class BookLibraryService {
         bookStatusChangeRepository.save(BookStatusChange.builder()
             .book(bookStatusChg.getBook())
             .bookStatus(BookStatus.builder().id(BookStatusValue.BORROWED.getId()).build())
-            .bookUsedBy(reservedTo)
-            .changedBy(userAccount)
+            .bookUsedBy(bookStatusChg.getBookUsedBy())
             .validFrom(now)
             .validTo(validTo)
             .build());
@@ -179,7 +168,7 @@ public class BookLibraryService {
             .getBookByBookId(bookId)
             .orElseThrow(EntityNotFoundException::new);
 
-        return bookChg.getChangedBy().getId().equals(userAccount.getId());
+        return bookChg.getCreatedBy().getId().equals(userAccount.getId());
     }
 
     private void addBookStatus(int bookId, BookStatusValue newStatus, UserAccount bookUsedBy, UserAccount changedBy, LocalDateTime validTo) {
@@ -191,7 +180,6 @@ public class BookLibraryService {
             .book(bookChg.getBook())
             .bookStatus(BookStatus.builder().id(newStatus.getId()).build())
             .bookUsedBy(bookUsedBy)
-            .changedBy(changedBy)
             .validFrom(LocalDateTime.now())
             .validTo(validTo)
             .build());

@@ -1,9 +1,10 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { BehaviorSubject } from "rxjs";
 
 @Injectable({ providedIn: "root" })
 export class AlertService {
-  private error: string = "";
+  private error: BehaviorSubject<string> = new BehaviorSubject<string>("");
 
   setError(err: any) {
     if (err instanceof HttpErrorResponse) {
@@ -13,14 +14,14 @@ export class AlertService {
         msg = `${msg}: ${err.error.error}`;
       }
 
-      this.error = msg;
+      this.error.next(msg);
       return;
     }
 
-    this.error = String(err);
+    this.error.next(String(err));
   }
 
   getError() {
-    return this.error;
+    return this.error.value;
   }
 }

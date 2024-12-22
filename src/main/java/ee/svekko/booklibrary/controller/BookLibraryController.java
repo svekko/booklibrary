@@ -2,7 +2,6 @@ package ee.svekko.booklibrary.controller;
 
 import ee.svekko.booklibrary.dto.AddBookRequestDto;
 import ee.svekko.booklibrary.dto.BookResponseDto;
-import ee.svekko.booklibrary.dto.CompleteBookReservationRequestDto;
 import ee.svekko.booklibrary.model.UserAccount;
 import ee.svekko.booklibrary.service.BookLibraryService;
 import lombok.RequiredArgsConstructor;
@@ -45,9 +44,9 @@ public class BookLibraryController {
     }
 
     @PostMapping("/books/{id}/complete-reservation")
-    public void completeBookReservation(@PathVariable int id, @RequestBody(required = false) CompleteBookReservationRequestDto requestDto) {
+    public void completeBookReservation(@PathVariable int id) {
         UserAccount userAccount = UserAccount.fromSecurityContext();
-        bookLibraryService.completeBookReservation(userAccount, requestDto, id);
+        bookLibraryService.completeBookReservation(userAccount, id);
     }
 
     @PostMapping("/books/{id}/cancel-reservation")

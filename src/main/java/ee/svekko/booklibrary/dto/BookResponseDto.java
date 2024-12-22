@@ -1,5 +1,7 @@
 package ee.svekko.booklibrary.dto;
 
+import java.time.LocalDateTime;
+
 public interface BookResponseDto {
     int getId();
 
@@ -10,4 +12,10 @@ public interface BookResponseDto {
     String getStatusName();
 
     Integer getBookUsedById();
+
+    String getBookUsedByEmail();
+
+    Integer getCreatedById();
+
+    LocalDateTime getStatusValidTo();
 }
