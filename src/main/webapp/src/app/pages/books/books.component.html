@@ -1,0 +1,45 @@
+<div>
+    <div class="filters">
+        <input type="text" (input)="searchBooks($event)" placeholder="Search..."/>
+    </div>
+
+    @if (books.length) {
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (book of books; track $index) {
+                    <tr>
+                        <td>{{$index + 1}}</td>
+                        <td>{{book.title}}</td>
+                        <td>{{book.statusName ? (book.statusName + " until " + (book.statusValidTo | date)) : "AVAILABLE"}}</td>
+                        <td class="actions">
+                            @if (book.statusId === BookStatus.Reserved && bookBelongsToMe(book)) {
+                                <button (click)="completeBookReservation(book.id)">Complete my reservation</button>
+                                <button (click)="cancelBookReservation(book.id)">Cancel my reservation</button>
+                            } @else if (book.statusId === BookStatus.Reserved && bookIsCreatedByMe(book)) {
+                                <button (click)="completeBookReservation(book.id)">Complete {{book.bookUsedByEmail}} reservation</button>
+                                <button (click)="cancelBookReservation(book.id)">Cancel {{book.bookUsedByEmail}} reservation</button>
+                            } @else if (book.statusId === BookStatus.Borrowed && bookBelongsToMe(book)) {
+                                <button (click)="returnBook(book.id)">Return my book</button>
+                            } @else if (book.statusId === BookStatus.Borrowed && bookIsCreatedByMe(book)) {
+                                <button (click)="returnBook(book.id)">Return {{book.bookUsedByEmail}} book</button>
+                            } @else if (!book.statusId) {
+                                <button (click)="reserveBook(book.id)">Reserve for myself</button>
+                                <button (click)="borrowBook(book.id)">Borrow for myself</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    } @else {
+        <p>No books were found</p>
+    }
+</div>

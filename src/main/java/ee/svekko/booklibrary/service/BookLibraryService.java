@@ -11,6 +11,7 @@ import ee.svekko.booklibrary.repository.BookStatusChangeRepository;
 import ee.svekko.booklibrary.util.TimeUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +27,8 @@ public class BookLibraryService {
     private final BookRepository bookRepository;
     private final BookLibraryConfig bookLibraryConfig;
 
-    public List<BookResponseDto> getBooks() {
-        return bookChangeRepository.getBooks();
+    public List<BookResponseDto> getBooks(String title) {
+        return bookChangeRepository.getBooks("%" + StringUtils.trim(title) + "%");
     }
 
     @Transactional

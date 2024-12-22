@@ -2,6 +2,7 @@ package ee.svekko.booklibrary.controller;
 
 import ee.svekko.booklibrary.dto.AddBookRequestDto;
 import ee.svekko.booklibrary.dto.BookResponseDto;
+import ee.svekko.booklibrary.dto.GetBookRequestDto;
 import ee.svekko.booklibrary.model.UserAccount;
 import ee.svekko.booklibrary.service.BookLibraryService;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,8 @@ public class BookLibraryController {
     private final BookLibraryService bookLibraryService;
 
     @GetMapping("/books")
-    public List<BookResponseDto> getBooks() {
-        return bookLibraryService.getBooks();
+    public List<BookResponseDto> getBooks(GetBookRequestDto requestDto) {
+        return bookLibraryService.getBooks(requestDto.getTitle());
     }
 
     @PostMapping("/books")

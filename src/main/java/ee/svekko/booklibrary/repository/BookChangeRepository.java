@@ -47,8 +47,9 @@ public interface BookChangeRepository extends CrudRepository<BookChange, Integer
             )
             WHERE book_change.valid_from <= now()
             AND book_change.valid_to > now()
+            AND book_change.title ILIKE :title
             ORDER BY book_change.valid_from DESC
             """
     )
-    List<BookResponseDto> getBooks();
+    List<BookResponseDto> getBooks(String title);
 }
