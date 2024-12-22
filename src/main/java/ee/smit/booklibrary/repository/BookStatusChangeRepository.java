@@ -12,11 +12,14 @@ public interface BookStatusChangeRepository extends CrudRepository<BookStatusCha
     @Query(
         nativeQuery = true,
         value = """
-            SELECT *
+            SELECT book_status_change.*
             FROM book_status_change
-            WHERE book_id = :bookId
-            AND valid_from <= now()
-            AND valid_to > now()
+            JOIN book_change ON (book_change.book_id = book_status_change.book_id)
+            WHERE book_status_change.book_id = :bookId
+            AND book_status_change.valid_from <= now()
+            AND book_status_change.valid_to > now()
+            AND book_change.valid_from <= now()
+            AND book_change.valid_to > now()
             """
     )
     Optional<BookStatusChange> findValidBookStatusChangeByBookId(int bookId);

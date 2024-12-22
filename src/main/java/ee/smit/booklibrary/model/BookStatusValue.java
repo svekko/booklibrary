@@ -6,9 +6,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum BookStatusValue {
-    NOT_IN_USE(1),
-    RESERVED(2),
-    BORROWED(3);
+    RESERVED(1),
+    BORROWED(2);
 
     private final int id;
 

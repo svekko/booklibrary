@@ -31,11 +31,9 @@ public class ExceptionController {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<JsonResponseDto> handleEntityNotFoundException(EntityNotFoundException e) {
-        log.error(e.getMessage());
         JsonResponseDto responseDto = JsonResponseDto.error("notFound");
         return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
     }
-
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<JsonResponseDto> handleException(Exception e) {

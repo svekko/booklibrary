@@ -5,12 +5,13 @@ import ee.smit.booklibrary.dto.BookResponseDto;
 import ee.smit.booklibrary.dto.CompleteBookReservationRequestDto;
 import ee.smit.booklibrary.exception.BookActionException;
 import ee.smit.booklibrary.model.*;
+import ee.smit.booklibrary.repository.BookChangeRepository;
 import ee.smit.booklibrary.repository.BookRepository;
 import ee.smit.booklibrary.repository.BookStatusChangeRepository;
 import ee.smit.booklibrary.util.TimeUtil;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,32 +22,31 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookLibraryService {
     private final BookStatusChangeRepository bookStatusChangeRepository;
+    private final BookChangeRepository bookChangeRepository;
     private final BookRepository bookRepository;
 
     public List<BookResponseDto> getBooks() {
-        return bookRepository.getBooks()
+        return bookChangeRepository.getBooks()
             .stream()
-            .map(Book::toBookResponseDto)
+            .map(BookChange::toBookResponseDto)
             .toList();
     }
 
     public List<BookResponseDto> getOwnBooks(UserAccount userAccount) {
-        return bookRepository.getBooksWhereAddedBy(userAccount.getId())
+        return bookChangeRepository.getBooksWhereChangedBy(userAccount.getId())
             .stream()
-            .map(Book::toBookResponseDto)
+            .map(BookChange::toBookResponseDto)
             .toList();
     }
 
     @Transactional
     public void addBook(UserAccount userAccount, AddBookRequestDto requestDto) {
         Book book = bookRepository.save(Book.builder()
-            .title(requestDto.getTitle())
-            .addedBy(userAccount)
             .build());
 
-        bookStatusChangeRepository.save(BookStatusChange.builder()
+        bookChangeRepository.save(BookChange.builder()
             .book(book)
-            .bookStatus(BookStatus.builder().id(BookStatusValue.NOT_IN_USE.getId()).build())
+            .title(requestDto.getTitle())
             .changedBy(userAccount)
             .validFrom(LocalDateTime.now())
             .validTo(TimeUtil.maxDateTime())
@@ -54,57 +54,57 @@ public class BookLibraryService {
     }
 
     @Transactional
-    public void removeBook(UserAccount userAccount, int id) {
-        if (!isOwnBook(userAccount, id)) {
+    public void removeBook(UserAccount userAccount, int bookId) {
+        BookChange bookChg = bookChangeRepository
+            .getBookByBookId(bookId)
+            .orElseThrow(EntityNotFoundException::new);
+
+        if (!bookChg.getChangedBy().getId().equals(userAccount.getId())) {
             throw new BookActionException(BookActionException.Error.NOT_OWN_BOOK);
         }
 
-        BookStatusChange bookStatusChg = bookStatusChangeRepository
-            .findValidBookStatusChangeByBookId(id)
-            .orElseThrow(EntityNotFoundException::new);
+        bookChg.setValidTo(LocalDateTime.now());
+        bookChangeRepository.save(bookChg);
 
-        bookStatusChg.setValidTo(LocalDateTime.now());
-        bookStatusChangeRepository.save(bookStatusChg);
-
-        bookStatusChangeRepository.save(BookStatusChange.builder()
-            .book(bookStatusChg.getBook())
-            .bookStatus(BookStatus.builder().id(BookStatusValue.NOT_IN_USE.getId()).build())
+        bookChangeRepository.save(BookChange.builder()
+            .book(bookChg.getBook())
+            .title(bookChg.getTitle())
             .changedBy(userAccount)
-            .validFrom(bookStatusChg.getValidTo())
-            .validTo(bookStatusChg.getValidTo())
+            .validFrom(bookChg.getValidTo())
+            .validTo(bookChg.getValidTo())
             .build());
     }
 
     @Transactional
-    public void reserveBook(UserAccount userAccount, int id) {
+    public void reserveBook(UserAccount userAccount, int bookId) {
         BookStatusChange bookStatusChg = bookStatusChangeRepository
-            .findValidBookStatusChangeByBookId(id)
-            .orElseThrow(EntityNotFoundException::new);
+            .findValidBookStatusChangeByBookId(bookId)
+            .orElse(null);
 
-        if (!BookStatusValue.NOT_IN_USE.equals(bookStatusChg.getBookStatus())) {
+        if (bookStatusChg != null) {
             throw new BookActionException(BookActionException.Error.BOOK_NOT_AVAILABLE);
         }
 
-        editBookStatus(bookStatusChg, BookStatusValue.RESERVED, userAccount, userAccount);
+        addBookStatus(bookId, BookStatusValue.RESERVED, userAccount, userAccount);
     }
 
     @Transactional
-    public void borrowBook(UserAccount userAccount, int id) {
+    public void borrowBook(UserAccount userAccount, int bookId) {
         BookStatusChange bookStatusChg = bookStatusChangeRepository
-            .findValidBookStatusChangeByBookId(id)
-            .orElseThrow(EntityNotFoundException::new);
+            .findValidBookStatusChangeByBookId(bookId)
+            .orElse(null);
 
-        if (!BookStatusValue.NOT_IN_USE.equals(bookStatusChg.getBookStatus())) {
+        if (bookStatusChg != null) {
             throw new BookActionException(BookActionException.Error.BOOK_NOT_AVAILABLE);
         }
 
-        editBookStatus(bookStatusChg, BookStatusValue.BORROWED, userAccount, userAccount);
+        addBookStatus(bookId, BookStatusValue.BORROWED, userAccount, userAccount);
     }
 
     @Transactional
-    public void completeBookReservation(UserAccount userAccount, @Nullable CompleteBookReservationRequestDto requestDto, int id) {
+    public void completeBookReservation(UserAccount userAccount, @Nullable CompleteBookReservationRequestDto requestDto, int bookId) {
         BookStatusChange bookStatusChg = bookStatusChangeRepository
-            .findValidBookStatusChangeByBookId(id)
+            .findValidBookStatusChangeByBookId(bookId)
             .orElseThrow(EntityNotFoundException::new);
 
         UserAccount reservedTo = UserAccount.builder()
@@ -115,17 +115,26 @@ public class BookLibraryService {
             throw new BookActionException(BookActionException.Error.BOOK_NOT_RESERVED);
         }
 
-        if (!userAccount.getId().equals(reservedTo.getId()) && !isOwnBook(userAccount, id)) {
+        if (!userAccount.getId().equals(reservedTo.getId()) && !isOwnBook(userAccount, bookId)) {
             throw new BookActionException(BookActionException.Error.CAN_COMPLETE_ONLY_OWN_BOOK_RESERVATION);
         }
 
-        editBookStatus(bookStatusChg, BookStatusValue.BORROWED, reservedTo, userAccount);
+        removeBookStatus(bookStatusChg);
+
+        bookStatusChangeRepository.save(BookStatusChange.builder()
+            .book(bookStatusChg.getBook())
+            .bookStatus(BookStatus.builder().id(BookStatusValue.BORROWED.getId()).build())
+            .bookUsedBy(reservedTo)
+            .changedBy(userAccount)
+            .validFrom(bookStatusChg.getValidTo())
+            .validTo(TimeUtil.maxDateTime())
+            .build());
     }
 
     @Transactional
-    public void cancelBookReservation(UserAccount userAccount, int id) {
+    public void cancelBookReservation(UserAccount userAccount, int bookId) {
         BookStatusChange bookStatusChg = bookStatusChangeRepository
-            .findValidBookStatusChangeByBookId(id)
+            .findValidBookStatusChangeByBookId(bookId)
             .orElseThrow(EntityNotFoundException::new);
 
         UserAccount bookUsedBy = bookStatusChg.getBookUsedBy();
@@ -134,17 +143,17 @@ public class BookLibraryService {
             throw new BookActionException(BookActionException.Error.BOOK_NOT_RESERVED);
         }
 
-        if (!bookUsedBy.getId().equals(userAccount.getId()) && !isOwnBook(userAccount, id)) {
+        if (!bookUsedBy.getId().equals(userAccount.getId()) && !isOwnBook(userAccount, bookId)) {
             throw new BookActionException(BookActionException.Error.BOOK_RESERVED_FOR_SOMEONE_ELSE);
         }
 
-        editBookStatus(bookStatusChg, BookStatusValue.NOT_IN_USE, null, userAccount);
+        removeBookStatus(bookStatusChg);
     }
 
     @Transactional
-    public void returnBook(UserAccount userAccount, int id) {
+    public void returnBook(UserAccount userAccount, int bookId) {
         BookStatusChange bookStatusChg = bookStatusChangeRepository
-            .findValidBookStatusChangeByBookId(id)
+            .findValidBookStatusChangeByBookId(bookId)
             .orElseThrow(EntityNotFoundException::new);
 
         UserAccount bookUsedBy = bookStatusChg.getBookUsedBy();
@@ -153,29 +162,38 @@ public class BookLibraryService {
             throw new BookActionException(BookActionException.Error.BOOK_NOT_BORROWED);
         }
 
-        if (!bookUsedBy.getId().equals(userAccount.getId()) && !isOwnBook(userAccount, id)) {
+        if (!bookUsedBy.getId().equals(userAccount.getId()) && !isOwnBook(userAccount, bookId)) {
             throw new BookActionException(BookActionException.Error.BOOK_BORROWED_BY_SOMEONE_ELSE);
         }
 
-        editBookStatus(bookStatusChg, BookStatusValue.NOT_IN_USE, null, userAccount);
+        removeBookStatus(bookStatusChg);
     }
 
     private boolean isOwnBook(UserAccount userAccount, int bookId) {
-        Book book = bookRepository.findValidBookByBookId(bookId).orElseThrow(EntityNotFoundException::new);
-        return book.getAddedBy().getId().equals(userAccount.getId());
+        BookChange bookChg = bookChangeRepository
+            .getBookByBookId(bookId)
+            .orElseThrow(EntityNotFoundException::new);
+
+        return bookChg.getChangedBy().getId().equals(userAccount.getId());
     }
 
-    private void editBookStatus(BookStatusChange bookStatusChg, BookStatusValue newStatus, UserAccount bookUsedBy, UserAccount changedBy) {
-        bookStatusChg.setValidTo(LocalDateTime.now());
-        bookStatusChangeRepository.save(bookStatusChg);
+    private void addBookStatus(int bookId, BookStatusValue newStatus, UserAccount bookUsedBy, UserAccount changedBy) {
+        BookChange bookChg = bookChangeRepository
+            .getBookByBookId(bookId)
+            .orElseThrow(EntityNotFoundException::new);
 
         bookStatusChangeRepository.save(BookStatusChange.builder()
-            .book(bookStatusChg.getBook())
+            .book(bookChg.getBook())
             .bookStatus(BookStatus.builder().id(newStatus.getId()).build())
             .bookUsedBy(bookUsedBy)
             .changedBy(changedBy)
-            .validFrom(bookStatusChg.getValidTo())
+            .validFrom(LocalDateTime.now())
             .validTo(TimeUtil.maxDateTime())
             .build());
+    }
+
+    private void removeBookStatus(BookStatusChange bookStatusChg) {
+        bookStatusChg.setValidTo(LocalDateTime.now());
+        bookStatusChangeRepository.save(bookStatusChg);
     }
 }

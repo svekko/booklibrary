@@ -10,9 +10,16 @@ CREATE TABLE book_status (
 );
 
 CREATE TABLE book (
+    id BIGSERIAL PRIMARY KEY
+);
+
+CREATE TABLE book_change (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(256) NOT NULL,
-    added_by_id INTEGER REFERENCES user_account (id) NOT NULL
+    book_id INTEGER REFERENCES book (id) NOT NULL,
+    changed_by_id INTEGER REFERENCES user_account (id) NOT NULL,
+    valid_from TIMESTAMP WITH TIME ZONE NOT NULL,
+    valid_to TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE book_status_change (
@@ -26,9 +33,8 @@ CREATE TABLE book_status_change (
 );
 
 INSERT INTO book_status (id, name)
-    VALUES (1, 'NOT_IN_USE'),
-           (2, 'RESERVED'),
-           (3, 'BORROWER');
+    VALUES (1, 'RESERVED'),
+           (2, 'BORROWED');
 
 INSERT INTO user_account (email, password)
     VALUES ('test1@local.host', '$2a$10$BMBf6Da2ZuSWBZpAZm2Vb.JvDkbCjpLlNCnWKMNVlV7wDxVKrzNcy' /* abc123 */),
