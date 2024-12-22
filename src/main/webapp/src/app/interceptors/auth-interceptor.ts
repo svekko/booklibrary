@@ -10,6 +10,10 @@ export class AuthInterceptor implements HttpInterceptor {
   private cookieService = inject(CookieService);
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (req.method === "POST") {
+      this.alertService.setError("");
+    }
+
     return next
       .handle(req)
       .pipe(catchError(err => this.handleError(err)));
