@@ -51,7 +51,7 @@ public class AuthConfiguration {
             })
             .authorizeHttpRequests((auth) -> {
                 auth
-                    .requestMatchers(HttpMethod.POST, "/login", "/logout").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/login", "/register", "/logout").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .anyRequest().authenticated();
             })

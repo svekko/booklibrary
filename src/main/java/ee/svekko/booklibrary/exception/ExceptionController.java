@@ -22,6 +22,13 @@ public class ExceptionController {
         return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<JsonResponseDto> handleBadRequestException(BadRequestException e) {
+        log.error(e.getMessage());
+        JsonResponseDto responseDto = JsonResponseDto.error(e.getMessage());
+        return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<JsonResponseDto> handleBadCredentialsException(BadCredentialsException e) {
         log.error(e.getMessage());

@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class AuthManager implements AuthenticationManager {
-    private UserAccountRepository userAccountRepository;
-    private PasswordEncoder encoder;
+    private final UserAccountRepository userAccountRepository;
+    private final PasswordEncoder encoder;
 
     @Override
     public Authentication authenticate(Authentication auth) {
         String email = auth.getPrincipal() + "";
         String password = auth.getCredentials() + "";
-        UserAccount userAccount = userAccountRepository.findByEmail(email);
+        UserAccount userAccount = userAccountRepository.findByEmail(email).orElse(null);
 
         if (userAccount == null) {
             throw new BadCredentialsException("User not found");

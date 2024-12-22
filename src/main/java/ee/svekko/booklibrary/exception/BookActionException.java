@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-public class BookActionException extends RuntimeException {
+public class BookActionException extends BadRequestException {
     private final Error error;
 
     public BookActionException(Error error) {
