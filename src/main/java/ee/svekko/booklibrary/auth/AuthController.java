@@ -2,6 +2,7 @@ package ee.svekko.booklibrary.auth;
 
 import ee.svekko.booklibrary.dto.JsonResponseDto;
 import ee.svekko.booklibrary.dto.LoginRequestDto;
+import ee.svekko.booklibrary.userdata.UserDataCookieService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -23,6 +24,7 @@ public class AuthController {
     private final SecurityContextHolderStrategy strategy;
     private final SecurityContextRepository repository;
     private final AuthManager authManager;
+    private final UserDataCookieService userDataCookieService;
 
     @PostMapping("/login")
     public JsonResponseDto login(@Valid @RequestBody LoginRequestDto reqData, HttpServletRequest req, HttpServletResponse resp) {
@@ -36,6 +38,7 @@ public class AuthController {
         securityContext.setAuthentication(authentication);
         strategy.setContext(securityContext);
         repository.saveContext(securityContext, req, resp);
+        userDataCookieService.setUserDataCookie(resp);
 
         return new JsonResponseDto();
     }
@@ -49,6 +52,7 @@ public class AuthController {
             session.invalidate();
         }
 
+        userDataCookieService.setUserDataCookie(resp);
         return new JsonResponseDto();
     }
 }
