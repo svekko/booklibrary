@@ -1,4 +1,4 @@
-import { CommonModule } from "@angular/common";
+import { CommonModule, Location } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { Router, RouterOutlet } from "@angular/router";
 import { CookieService } from "ngx-cookie-service";
@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
   private appService = inject(AppService);
   private cookieService = inject(CookieService);
   private router = inject(Router);
+  private location = inject(Location);
 
   userService = inject(UserService);
 
@@ -28,7 +29,14 @@ export class AppComponent implements OnInit {
     const userDataCookie = this.cookieService.get("user-data");
 
     if (userDataCookie) {
-      const userData = JSON.parse(atob(userDataCookie)) as UserInfo;
+      let userData;
+
+      try {
+        userData = JSON.parse(atob(userDataCookie)) as UserInfo;
+      } catch (e) {
+        userData = { authenticated: false };
+      }
+
       if (userData?.authenticated) {
         this.userService.setUserInfo(userData);
         this.router.navigateByUrl("/books");
@@ -36,7 +44,9 @@ export class AppComponent implements OnInit {
       }
     }
 
-    this.router.navigateByUrl("/login");
+    if (this.location.path() !== "/register") {
+      this.router.navigateByUrl("/login");
+    }
   }
 
   logout() {

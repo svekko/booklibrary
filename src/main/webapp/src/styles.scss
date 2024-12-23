@@ -28,35 +28,55 @@ input, select {
     margin: 0 0 1rem 0;
 }
 
-.input-controls {
-    padding: 0.25rem;
-    margin: 0 0 1rem 0;
-}
-
-.input-controls > label {
-    margin: 0 0.25rem 0 0;
-    min-width: 125px;
-    display: inline-block;
-}
-
-.input-controls > input[type="checkbox"] ~ label {
-    margin-left: 0.25rem;
-}
-
-.input-controls > select {
-    min-width: 225px;
-}
-
 .center-container {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-}
 
-.center-container > .form {
-    padding: 1rem;
-    background-color: #d1e5e9;
-    border-radius: 3px;
-    border: 1px solid #93b5c5;
-    display: inline-block;
+    & > .form {
+        padding: 1rem;
+        background-color: #d1e5e9;
+        border-radius: 3px;
+        border: 1px solid #93b5c5;
+        display: inline-block;
+
+        .input-controls {
+            padding: 0.25rem;
+            margin: 0 0 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+
+            & > .input-error {
+                flex-basis: 100%;
+                text-align: right;
+                margin-top: 0.25rem;
+            }
+
+            & > label {
+                margin: 0 0.25rem 0 0;
+                min-width: 125px;
+                display: inline-block;
+                margin-right: 1.5rem;
+            }
+            
+            & > input[type="checkbox"] ~ label {
+                margin-left: 0.25rem;
+            }
+            
+            & > select {
+                min-width: 225px;
+            }
+        }
+
+        & > .actions {
+            display: flex;
+            justify-content: center;
+        }
+
+        & ~ button {
+            margin-top: 1rem;
+        }
+    }
 }

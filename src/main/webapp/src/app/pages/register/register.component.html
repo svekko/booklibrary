@@ -1,5 +1,5 @@
 <div class="center-container">
-    <p class="title">Login</p>
+    <p class="title">Register</p>
     
     <form [formGroup]="formGroup" class="form" (ngSubmit)="onSubmit()">    
         <div class="input-controls">
@@ -13,11 +13,17 @@
             <input id="l-password" type="password" formControlName="password"/>
             <div *ngIf="formGroup.touched && formGroup.controls['password'].errors" class="input-error">Invalid password</div>
         </div>
+
+        <div class="input-controls">
+            <label for="l-passwordConfirm">Confirm password:</label>
+            <input id="l-passwordConfirm" type="password" formControlName="passwordConfirm"/>
+            <div *ngIf="formGroup.touched && formGroup.controls['passwordConfirm'].errors" class="input-error">Invalid password</div>
+        </div>
     
         <div class="actions">
             <button type="submit">Submit</button>
         </div>
     </form>
 
-    <button type="button" (click)="toRegisterPage()">Register a new user</button>
+    <button type="button" (click)="toLoginPage()">Login with existing user</button>
 </div>
