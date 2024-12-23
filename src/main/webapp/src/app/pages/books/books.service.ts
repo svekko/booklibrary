@@ -6,7 +6,7 @@ import { BookDto } from "../../model/book.dto";
 @Injectable({ providedIn: 'root' })
 export class BooksService extends ApiService {
   getBooks(title: string): Observable<any> {
-    return this.http.get<BookDto[]>(this.apiAddr(`/books?title=${title}`), { withCredentials: true });
+    return this.http.get<BookDto[]>(this.apiAddr("/books"), { withCredentials: true, params: { title: title } });
   }
 
   removeBook(bookId: number): Observable<void> {

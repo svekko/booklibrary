@@ -67,7 +67,7 @@ public class AuthController {
             throw new InvalidDataException(InvalidDataError.USER_WITH_SUCH_EMAIL_EXISTS);
         }
 
-        userAccountRepository.save(UserAccount.builder()
+        userAccountRepository.saveAndFlush(UserAccount.builder()
             .email(email)
             .password(passwordEncoder.encode(passwd))
             .build());

@@ -38,10 +38,10 @@ public class BookLibraryService {
             throw new InvalidDataException(InvalidDataError.BOOK_MUST_HAVE_UNIQUE_TITLE);
         }
 
-        Book book = bookRepository.save(Book.builder()
+        Book book = bookRepository.saveAndFlush(Book.builder()
             .build());
 
-        bookChangeRepository.save(BookChange.builder()
+        bookChangeRepository.saveAndFlush(BookChange.builder()
             .book(book)
             .title(requestDto.getTitle())
             .createdBy(userAccount)
@@ -63,9 +63,9 @@ public class BookLibraryService {
         LocalDateTime now = LocalDateTime.now();
 
         bookChg.setValidTo(now);
-        bookChangeRepository.save(bookChg);
+        bookChangeRepository.saveAndFlush(bookChg);
 
-        bookChangeRepository.save(BookChange.builder()
+        bookChangeRepository.saveAndFlush(BookChange.builder()
             .book(bookChg.getBook())
             .title(bookChg.getTitle())
             .createdBy(userAccount)
@@ -85,7 +85,7 @@ public class BookLibraryService {
         }
 
         LocalDateTime validTo = LocalDateTime.now().plus(bookLibraryConfig.getBookHoursReserved(), ChronoUnit.HOURS);
-        addBookStatus(bookId, BookStatusValue.RESERVED, userAccount, userAccount, validTo);
+        addBookStatus(bookId, BookStatusValue.RESERVED, userAccount, validTo);
     }
 
     @Transactional
@@ -99,7 +99,7 @@ public class BookLibraryService {
         }
 
         LocalDateTime validTo = LocalDateTime.now().plus(bookLibraryConfig.getBookDaysBorrowed(), ChronoUnit.DAYS);
-        addBookStatus(bookId, BookStatusValue.BORROWED, userAccount, userAccount, validTo);
+        addBookStatus(bookId, BookStatusValue.BORROWED, userAccount, validTo);
     }
 
     @Transactional
@@ -120,9 +120,9 @@ public class BookLibraryService {
         LocalDateTime validTo = now.plus(bookLibraryConfig.getBookDaysBorrowed(), ChronoUnit.DAYS);
 
         bookStatusChg.setValidTo(now);
-        bookStatusChangeRepository.save(bookStatusChg);
+        bookStatusChangeRepository.saveAndFlush(bookStatusChg);
 
-        bookStatusChangeRepository.save(BookStatusChange.builder()
+        bookStatusChangeRepository.saveAndFlush(BookStatusChange.builder()
             .book(bookStatusChg.getBook())
             .bookStatus(BookStatus.builder().id(BookStatusValue.BORROWED.getId()).build())
             .bookUsedBy(bookStatusChg.getBookUsedBy())
@@ -177,12 +177,12 @@ public class BookLibraryService {
         return bookChg.getCreatedBy().getId().equals(userAccount.getId());
     }
 
-    private void addBookStatus(int bookId, BookStatusValue newStatus, UserAccount bookUsedBy, UserAccount changedBy, LocalDateTime validTo) {
+    private void addBookStatus(int bookId, BookStatusValue newStatus, UserAccount bookUsedBy, LocalDateTime validTo) {
         BookChange bookChg = bookChangeRepository
             .getBookByBookId(bookId)
             .orElseThrow(EntityNotFoundException::new);
 
-        bookStatusChangeRepository.save(BookStatusChange.builder()
+        bookStatusChangeRepository.saveAndFlush(BookStatusChange.builder()
             .book(bookChg.getBook())
             .bookStatus(BookStatus.builder().id(newStatus.getId()).build())
             .bookUsedBy(bookUsedBy)
@@ -193,6 +193,6 @@ public class BookLibraryService {
 
     private void removeBookStatus(BookStatusChange bookStatusChg) {
         bookStatusChg.setValidTo(LocalDateTime.now());
-        bookStatusChangeRepository.save(bookStatusChg);
+        bookStatusChangeRepository.saveAndFlush(bookStatusChg);
     }
 }
