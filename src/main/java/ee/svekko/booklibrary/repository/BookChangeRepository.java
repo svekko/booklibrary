@@ -26,6 +26,18 @@ public interface BookChangeRepository extends CrudRepository<BookChange, Integer
     @Query(
         nativeQuery = true,
         value = """
+            SELECT *
+            FROM book_change
+            WHERE trim(upper(title)) = trim(upper(:title))
+            AND valid_from <= now()
+            AND valid_to > now()
+            """
+    )
+    Optional<BookResponseDto> getBookByTitle(String title);
+
+    @Query(
+        nativeQuery = true,
+        value = """
             SELECT book_change.*,
                    book_status.id AS status_id,
                    book_status.name AS status_name,

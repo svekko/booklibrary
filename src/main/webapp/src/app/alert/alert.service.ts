@@ -1,10 +1,20 @@
 import { HttpErrorResponse } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
+import { NavigationEnd, Router } from "@angular/router";
 import { BehaviorSubject } from "rxjs";
 
 @Injectable({ providedIn: "root" })
 export class AlertService {
   private error: BehaviorSubject<string> = new BehaviorSubject<string>("");
+  private router = inject(Router);
+
+  constructor() {
+    this.router.events.subscribe((ev) => {
+      if (ev instanceof NavigationEnd) {
+        this.error.next("");
+      }
+    });
+  }
 
   setError(err: any) {
     if (err instanceof HttpErrorResponse) {

@@ -1,0 +1,17 @@
+<div class="center-container">
+    <p class="title">Add a new book</p>
+    
+    <form [formGroup]="formGroup" class="form" (ngSubmit)="onSubmit()">    
+        <div class="input-controls">
+            <label for="l-title">Title:</label>
+            <input id="l-title" type="text" formControlName="title"/>
+            <div *ngIf="formGroup.touched && formGroup.controls['title'].errors" class="input-error">Invalid title</div>
+        </div>
+    
+        <div class="actions">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+    <button type="button" (click)="toBooksPage()">Back to books listing</button>
+</div>

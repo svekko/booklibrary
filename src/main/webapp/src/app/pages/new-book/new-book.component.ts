@@ -4,37 +4,29 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angula
 import { Router } from "@angular/router";
 import { catchError, of, tap } from "rxjs";
 import { AlertService } from "../../alert/alert.service";
-import { RegisterService } from "./register.service";
+import { NewBookService } from "./new-book.service";
 
 @Component({
-  selector: 'app-register',
+  selector: 'app-new-book',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.scss'
+  templateUrl: './new-book.component.html',
+  styleUrl: './new-book.component.scss'
 })
-export class RegisterComponent {
-  private registerService = inject(RegisterService);
+export class NewBookComponent {
+  private newBookService = inject(NewBookService);
   private router = inject(Router);
   private alertService = inject(AlertService);
 
   formGroup = new FormGroup({
-    email: new FormControl("", {
-      validators: [Validators.required, Validators.email, Validators.maxLength(256)],
-      updateOn: "submit",
-    }),
-    password: new FormControl("", {
-      validators: [Validators.required, Validators.maxLength(256)],
-      updateOn: "submit",
-    }),
-    passwordConfirm: new FormControl("", {
+    title: new FormControl("", {
       validators: [Validators.required, Validators.maxLength(256)],
       updateOn: "submit",
     }),
   });
 
-  toLoginPage = () => {
-    this.router.navigateByUrl("/login");
+  toBooksPage = () => {
+    this.router.navigateByUrl("/books");
   };
 
   onSubmit() {
@@ -42,13 +34,13 @@ export class RegisterComponent {
     this.alertService.setError("");
 
     if (this.formGroup.valid) {
-      this.registerService
-        .register(this.formGroup.getRawValue())
+      this.newBookService
+        .createNewBook(this.formGroup.getRawValue())
         .pipe(
-          tap(() => window.location.pathname = "/login"),
+          tap(() => this.toBooksPage()),
           catchError(() => {
             this.formGroup.markAsUntouched();
-            this.formGroup.patchValue({ "password": "", "passwordConfirm": "" });
+            this.formGroup.patchValue({ "title": "" });
             return of(null);
           })
         )

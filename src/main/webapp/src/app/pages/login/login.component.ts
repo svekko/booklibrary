@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { catchError, of, tap } from "rxjs";
+import { AlertService } from "../../alert/alert.service";
 import { LoginService } from "./login.service";
 
 @Component({
@@ -15,6 +16,7 @@ import { LoginService } from "./login.service";
 export class LoginComponent {
   private loginService = inject(LoginService);
   private router = inject(Router);
+  private alertService = inject(AlertService);
 
   formGroup = new FormGroup({
     email: new FormControl("", {
@@ -33,6 +35,7 @@ export class LoginComponent {
 
   onSubmit() {
     this.formGroup.markAsTouched();
+    this.alertService.setError("");
 
     if (this.formGroup.valid) {
       this.loginService

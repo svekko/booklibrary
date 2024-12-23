@@ -12,6 +12,7 @@ public enum InvalidDataError {
     BOOK_RESERVED_FOR_SOMEONE_ELSE("Book reserved for someone else"),
     BOOK_BORROWED_BY_SOMEONE_ELSE("Book borrowed by someone else"),
     NOT_OWN_BOOK("Not own book"),
+    BOOK_MUST_HAVE_UNIQUE_TITLE("Book must have a unique title"),
     CAN_COMPLETE_ONLY_OWN_BOOK_RESERVATION("Can complete only own book reservation"),
     PASSWORDS_MUST_BE_SAME("Passwords must have same value"),
     USER_WITH_SUCH_EMAIL_EXISTS("User with such email already exists");

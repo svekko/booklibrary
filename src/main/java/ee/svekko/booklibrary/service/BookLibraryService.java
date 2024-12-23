@@ -34,6 +34,10 @@ public class BookLibraryService {
 
     @Transactional
     public void addBook(UserAccount userAccount, AddBookRequestDto requestDto) {
+        if (bookChangeRepository.getBookByTitle(requestDto.getTitle()).isPresent()) {
+            throw new InvalidDataException(InvalidDataError.BOOK_MUST_HAVE_UNIQUE_TITLE);
+        }
+
         Book book = bookRepository.save(Book.builder()
             .build());
 
