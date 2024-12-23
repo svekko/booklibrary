@@ -33,12 +33,13 @@ public interface BookChangeRepository extends JpaRepository<BookChange, Integer>
             AND valid_to > now()
             """
     )
-    Optional<BookResponseDto> getBookByTitle(String title);
+    Optional<BookChange> getBookByTitle(String title);
 
     @Query(
         nativeQuery = true,
         value = """
-            SELECT book_change.*,
+            SELECT book_change.book_id AS id,
+                   book_change.title AS title,
                    book_status.id AS status_id,
                    book_status.name AS status_name,
                    book_used_by.id AS book_used_by_id,
