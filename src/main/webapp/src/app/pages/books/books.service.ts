@@ -9,6 +9,10 @@ export class BooksService extends ApiService {
     return this.http.get<BookDto[]>(this.apiAddr(`/books?title=${title}`), { withCredentials: true });
   }
 
+  removeBook(bookId: number): Observable<void> {
+    return this.http.delete<void>(this.apiAddr(`/books/${bookId}`), { withCredentials: true });
+  }
+
   reserveBook(bookId: number): Observable<void> {
     return this.http.post<void>(this.apiAddr(`/books/${bookId}/reserve`), {}, { withCredentials: true });
   }

@@ -28,6 +28,10 @@ export class BooksComponent implements OnInit {
     this.booksService.borrowBook(bookId).subscribe(() => this.loadBooks());
   };
 
+  removeBook = (bookId: number) => {
+    this.booksService.removeBook(bookId).subscribe(() => this.loadBooks());
+  };
+
   reserveBook = (bookId: number) => {
     this.booksService.reserveBook(bookId).subscribe(() => this.loadBooks());
   };

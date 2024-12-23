@@ -65,6 +65,7 @@ public class AuthConfiguration {
         CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(allowedCorsOrigins);
+        configuration.setAllowedMethods(List.of("GET", "POST", "DELETE"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

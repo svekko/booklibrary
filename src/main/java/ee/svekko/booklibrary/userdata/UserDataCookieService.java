@@ -31,6 +31,7 @@ public class UserDataCookieService {
 
         Cookie cookie = new Cookie("user-data", Base64.getEncoder().encodeToString(userAccountBytes));
         cookie.setHttpOnly(false);
+        cookie.setPath("/");
 
         response.addCookie(cookie);
     }

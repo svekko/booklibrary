@@ -51,6 +51,7 @@ export class AppComponent implements OnInit {
 
   logout() {
     this.appService.logout().subscribe(() => {
+      this.cookieService.deleteAll("user-data");
       window.location.pathname = "/login";
     });
   }

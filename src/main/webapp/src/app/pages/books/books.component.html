@@ -34,6 +34,10 @@
                                 <button (click)="reserveBook(book.id)">Reserve for myself</button>
                                 <button (click)="borrowBook(book.id)">Borrow for myself</button>
                             }
+
+                            @if (bookIsCreatedByMe(book)) {
+                                <button class="danger" (click)="removeBook(book.id)">Remove</button>
+                            }
                         </td>
                     </tr>
                 }
