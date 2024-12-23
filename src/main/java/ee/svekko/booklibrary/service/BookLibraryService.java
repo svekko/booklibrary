@@ -3,7 +3,8 @@ package ee.svekko.booklibrary.service;
 import ee.svekko.booklibrary.config.BookLibraryConfig;
 import ee.svekko.booklibrary.dto.AddBookRequestDto;
 import ee.svekko.booklibrary.dto.BookResponseDto;
-import ee.svekko.booklibrary.exception.BookActionException;
+import ee.svekko.booklibrary.error.InvalidDataError;
+import ee.svekko.booklibrary.exception.InvalidDataException;
 import ee.svekko.booklibrary.model.*;
 import ee.svekko.booklibrary.repository.BookChangeRepository;
 import ee.svekko.booklibrary.repository.BookRepository;
@@ -52,7 +53,7 @@ public class BookLibraryService {
             .orElseThrow(EntityNotFoundException::new);
 
         if (!bookChg.getCreatedBy().getId().equals(userAccount.getId())) {
-            throw new BookActionException(BookActionException.Error.NOT_OWN_BOOK);
+            throw new InvalidDataException(InvalidDataError.NOT_OWN_BOOK);
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -76,7 +77,7 @@ public class BookLibraryService {
             .orElse(null);
 
         if (bookStatusChg != null) {
-            throw new BookActionException(BookActionException.Error.BOOK_NOT_AVAILABLE);
+            throw new InvalidDataException(InvalidDataError.BOOK_NOT_AVAILABLE);
         }
 
         LocalDateTime validTo = LocalDateTime.now().plus(bookLibraryConfig.getBookHoursReserved(), ChronoUnit.HOURS);
@@ -90,7 +91,7 @@ public class BookLibraryService {
             .orElse(null);
 
         if (bookStatusChg != null) {
-            throw new BookActionException(BookActionException.Error.BOOK_NOT_AVAILABLE);
+            throw new InvalidDataException(InvalidDataError.BOOK_NOT_AVAILABLE);
         }
 
         LocalDateTime validTo = LocalDateTime.now().plus(bookLibraryConfig.getBookDaysBorrowed(), ChronoUnit.DAYS);
@@ -104,11 +105,11 @@ public class BookLibraryService {
             .orElseThrow(EntityNotFoundException::new);
 
         if (!BookStatusValue.RESERVED.equals(bookStatusChg.getBookStatus())) {
-            throw new BookActionException(BookActionException.Error.BOOK_NOT_RESERVED);
+            throw new InvalidDataException(InvalidDataError.BOOK_NOT_RESERVED);
         }
 
         if (!userAccount.getId().equals(bookStatusChg.getBookUsedBy().getId()) && !isOwnBook(userAccount, bookId)) {
-            throw new BookActionException(BookActionException.Error.CAN_COMPLETE_ONLY_OWN_BOOK_RESERVATION);
+            throw new InvalidDataException(InvalidDataError.CAN_COMPLETE_ONLY_OWN_BOOK_RESERVATION);
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -135,11 +136,11 @@ public class BookLibraryService {
         UserAccount bookUsedBy = bookStatusChg.getBookUsedBy();
 
         if (!BookStatusValue.RESERVED.equals(bookStatusChg.getBookStatus())) {
-            throw new BookActionException(BookActionException.Error.BOOK_NOT_RESERVED);
+            throw new InvalidDataException(InvalidDataError.BOOK_NOT_RESERVED);
         }
 
         if (!bookUsedBy.getId().equals(userAccount.getId()) && !isOwnBook(userAccount, bookId)) {
-            throw new BookActionException(BookActionException.Error.BOOK_RESERVED_FOR_SOMEONE_ELSE);
+            throw new InvalidDataException(InvalidDataError.BOOK_RESERVED_FOR_SOMEONE_ELSE);
         }
 
         removeBookStatus(bookStatusChg);
@@ -154,11 +155,11 @@ public class BookLibraryService {
         UserAccount bookUsedBy = bookStatusChg.getBookUsedBy();
 
         if (!BookStatusValue.BORROWED.equals(bookStatusChg.getBookStatus())) {
-            throw new BookActionException(BookActionException.Error.BOOK_NOT_BORROWED);
+            throw new InvalidDataException(InvalidDataError.BOOK_NOT_BORROWED);
         }
 
         if (!bookUsedBy.getId().equals(userAccount.getId()) && !isOwnBook(userAccount, bookId)) {
-            throw new BookActionException(BookActionException.Error.BOOK_BORROWED_BY_SOMEONE_ELSE);
+            throw new InvalidDataException(InvalidDataError.BOOK_BORROWED_BY_SOMEONE_ELSE);
         }
 
         removeBookStatus(bookStatusChg);

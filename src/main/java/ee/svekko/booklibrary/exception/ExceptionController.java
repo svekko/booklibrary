@@ -15,15 +15,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
 public class ExceptionController {
-    @ExceptionHandler(BookActionException.class)
-    public ResponseEntity<JsonResponseDto> handleBookActionException(BookActionException e) {
-        log.error(e.getError().getMessage());
-        JsonResponseDto responseDto = JsonResponseDto.error(e.getError().getMessage());
-        return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<JsonResponseDto> handleBadRequestException(BadRequestException e) {
+    @ExceptionHandler(InvalidDataException.class)
+    public ResponseEntity<JsonResponseDto> handleBadRequestException(InvalidDataException e) {
         log.error(e.getMessage());
         JsonResponseDto responseDto = JsonResponseDto.error(e.getMessage());
         return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);

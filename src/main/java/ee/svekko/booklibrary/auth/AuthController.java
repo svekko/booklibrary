@@ -3,7 +3,8 @@ package ee.svekko.booklibrary.auth;
 import ee.svekko.booklibrary.dto.JsonResponseDto;
 import ee.svekko.booklibrary.dto.LoginRequestDto;
 import ee.svekko.booklibrary.dto.RegisterRequestDto;
-import ee.svekko.booklibrary.exception.BadRequestException;
+import ee.svekko.booklibrary.error.InvalidDataError;
+import ee.svekko.booklibrary.exception.InvalidDataException;
 import ee.svekko.booklibrary.model.UserAccount;
 import ee.svekko.booklibrary.repository.UserAccountRepository;
 import ee.svekko.booklibrary.userdata.UserDataCookieService;
@@ -57,13 +58,13 @@ public class AuthController {
         String passwdConfirm = reqData.getPasswordConfirm();
 
         if (!StringUtils.equals(passwd, passwdConfirm)) {
-            throw new BadRequestException("Passwords must have same value");
+            throw new InvalidDataException(InvalidDataError.PASSWORDS_MUST_BE_SAME);
         }
 
         String email = reqData.getEmail();
 
         if (userAccountRepository.findByEmail(email).isPresent()) {
-            throw new BadRequestException("User with such email already exists");
+            throw new InvalidDataException(InvalidDataError.USER_WITH_SUCH_EMAIL_EXISTS);
         }
 
         userAccountRepository.save(UserAccount.builder()
