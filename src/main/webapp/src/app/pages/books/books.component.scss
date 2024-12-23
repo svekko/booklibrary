@@ -1,7 +1,13 @@
-.filters {
+.toolbar {
+    padding: 1rem;
     margin-bottom: 1rem;
     display: flex;
     justify-content: center;
+    border-bottom: 1px solid #93b5c5;
+
+    & > *:not(:last-child) {
+        margin-right: 1rem;
+    }
 }
 
 table {

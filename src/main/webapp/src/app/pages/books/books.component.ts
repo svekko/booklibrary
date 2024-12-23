@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from '@angular/core';
-import { Subscription, timer } from "rxjs";
+import { Router } from "@angular/router";
+import { finalize, Subscription, timer } from "rxjs";
 import { BookStatus } from "../../model/book-status";
 import { BookDto } from "../../model/book.dto";
 import { dateTimeProvider } from "../../provider/date";
@@ -18,8 +19,10 @@ import { BooksService } from "./books.service";
 export class BooksComponent implements OnInit {
   private booksService = inject(BooksService);
   private userService = inject(UserService);
+  private router = inject(Router);
   private searchTimer = Subscription.EMPTY;
 
+  loading = true;
   books: BookDto[] = [];
 
   protected BookStatus = BookStatus;
@@ -51,15 +54,20 @@ export class BooksComponent implements OnInit {
   searchBooks = (ev: Event) => {
     if (ev.currentTarget instanceof HTMLInputElement) {
       const value = ((ev.currentTarget) as HTMLInputElement).value;
+      this.loading = true;
       this.searchTimer.unsubscribe();
       this.searchTimer = timer(500).subscribe(() => this.loadBooks(value));
     }
   };
 
   loadBooks = (title = "") => {
-    this.booksService.getBooks(title).subscribe((books) => {
-      this.books = books;
-    });
+    this.booksService.getBooks(title)
+      .pipe(finalize(() => {
+        this.loading = false;
+      }))
+      .subscribe((books) => {
+        this.books = books;
+      });
   };
 
   bookBelongsToMe = (book: BookDto) => {
@@ -68,6 +76,10 @@ export class BooksComponent implements OnInit {
 
   bookIsCreatedByMe = (book: BookDto) => {
     return book.createdById === this.userService.getUserInfo().id;
+  };
+
+  goToNewBookPage = () => {
+    this.router.navigateByUrl("/books/new");
   };
 
   ngOnInit(): void {

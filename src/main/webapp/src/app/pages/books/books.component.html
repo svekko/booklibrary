@@ -1,9 +1,16 @@
 <div>
-    <div class="filters">
-        <input type="text" (input)="searchBooks($event)" placeholder="Search..."/>
+    <div class="toolbar">
+        <div>
+            <input type="text" (input)="searchBooks($event)" placeholder="Search..."/>
+        </div>
+        <div>
+            <button (click)="goToNewBookPage()">Add a book</button>
+        </div>
     </div>
 
-    @if (books.length) {
+    @if (loading) {
+        <p class="text-center">Loading...</p>
+    } @else if (books.length) {
         <table>
             <thead>
                 <tr>
@@ -44,6 +51,6 @@
             </tbody>
         </table>
     } @else {
-        <p>No books were found</p>
+        <p class="text-center">No books were found</p>
     }
 </div>
