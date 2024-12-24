@@ -4,6 +4,7 @@ import ee.svekko.booklibrary.dto.AddBookRequestDto;
 import ee.svekko.booklibrary.dto.BookResponseDto;
 import ee.svekko.booklibrary.model.UserAccount;
 import ee.svekko.booklibrary.service.BookLibraryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class BookLibraryController {
     }
 
     @PostMapping("/books")
-    public void addBook(@RequestBody AddBookRequestDto requestDto) {
+    public void addBook(@RequestBody @Valid AddBookRequestDto requestDto) {
         UserAccount userAccount = UserAccount.fromSecurityContext();
         bookLibraryService.addBook(userAccount, requestDto);
     }
