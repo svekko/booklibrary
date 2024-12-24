@@ -8,6 +8,8 @@ services:
   backend:
     links:
       - "db:database"
+    depends_on:
+      - db
     build:
       context: .
       dockerfile: ./docker/backend/Dockerfile
