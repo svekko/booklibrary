@@ -18,7 +18,7 @@
     * Edit `application.docker.properties` when running app using `docker`
     * Edit `application.properties` when running app natively
 * If editing server port then also edit `apiURL` in `environment.ts` in `webapp/environments`
-* Book reservation & borrow times can be configured using `book_hours_reserved` and `book_days_borrowed` parameters
+* Book reservation & borrow times can be configured using `book_hours_reserved` and `book_days_borrowed` values
 
 ## Running:
 
