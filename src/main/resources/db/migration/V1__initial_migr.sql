@@ -39,8 +39,3 @@ CREATE TABLE book_status_change (
 INSERT INTO book_status (id, name)
     VALUES (1, 'Reserved'),
            (2, 'Borrowed');
-
-INSERT INTO user_account (email, password)
-    VALUES ('test1@local.host', '$2a$10$BMBf6Da2ZuSWBZpAZm2Vb.JvDkbCjpLlNCnWKMNVlV7wDxVKrzNcy' /* abc123 */),
-           ('test2@local.host', '$2a$10$BMBf6Da2ZuSWBZpAZm2Vb.JvDkbCjpLlNCnWKMNVlV7wDxVKrzNcy' /* abc123 */),
-           ('test3@local.host', '$2a$10$BMBf6Da2ZuSWBZpAZm2Vb.JvDkbCjpLlNCnWKMNVlV7wDxVKrzNcy' /* abc123 */);

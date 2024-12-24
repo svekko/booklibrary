@@ -1,0 +1,4 @@
+FROM postgres:14-alpine
+ENV POSTGRES_DB=booklibrary
+ENV POSTGRES_USER=sven
+ENV POSTGRES_PASSWORD=sven
