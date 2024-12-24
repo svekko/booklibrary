@@ -20,8 +20,8 @@
 ## Configuration:
 
 * Files can be found in `src/main/resources` directory
-    * Edit `application.docker.properties` when running app using `docker`
-    * Edit `application.properties` when running app natively
+    * Edit `application.docker.properties` if running app using `docker`
+    * Edit `application.properties` if running app natively
 * If editing server port then also edit `apiURL` in `environment.ts` in `webapp/environments`
 * Book reservation & borrow times can be configured using `book_hours_reserved` and `book_days_borrowed` values
 
