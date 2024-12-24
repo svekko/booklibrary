@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { Router } from "@angular/router";
 import { finalize, Subscription, timer } from "rxjs";
 import { BookStatus } from "../../model/book-status";
@@ -27,28 +27,31 @@ export class BooksComponent implements OnInit {
 
   protected BookStatus = BookStatus;
 
+  @ViewChild("searchInput")
+  private searchInput!: ElementRef;
+
   borrowBook = (bookId: number) => {
-    this.booksService.borrowBook(bookId).subscribe(() => this.loadBooks());
+    this.booksService.borrowBook(bookId).subscribe(() => this.resetBooks());
   };
 
   removeBook = (bookId: number) => {
-    this.booksService.removeBook(bookId).subscribe(() => this.loadBooks());
+    this.booksService.removeBook(bookId).subscribe(() => this.resetBooks());
   };
 
   reserveBook = (bookId: number) => {
-    this.booksService.reserveBook(bookId).subscribe(() => this.loadBooks());
+    this.booksService.reserveBook(bookId).subscribe(() => this.resetBooks());
   };
 
   completeBookReservation = (bookId: number) => {
-    this.booksService.completeBookReservation(bookId).subscribe(() => this.loadBooks());
+    this.booksService.completeBookReservation(bookId).subscribe(() => this.resetBooks());
   };
 
   cancelBookReservation = (bookId: number) => {
-    this.booksService.cancelBookReservation(bookId).subscribe(() => this.loadBooks());
+    this.booksService.cancelBookReservation(bookId).subscribe(() => this.resetBooks());
   };
 
   returnBook = (bookId: number) => {
-    this.booksService.returnBook(bookId).subscribe(() => this.loadBooks());
+    this.booksService.returnBook(bookId).subscribe(() => this.resetBooks());
   };
 
   searchBooks = (ev: Event) => {
@@ -58,6 +61,11 @@ export class BooksComponent implements OnInit {
       this.searchTimer.unsubscribe();
       this.searchTimer = timer(500).subscribe(() => this.loadBooks(value));
     }
+  };
+
+  private resetBooks = () => {
+    this.searchInput.nativeElement.value = "";
+    this.loadBooks();
   };
 
   loadBooks = (title = "") => {

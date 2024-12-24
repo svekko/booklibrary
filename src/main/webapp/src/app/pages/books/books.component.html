@@ -1,7 +1,7 @@
 <div>
     <div class="toolbar">
         <div>
-            <input type="text" (input)="searchBooks($event)" placeholder="Search..."/>
+            <input type="text" (input)="searchBooks($event)" placeholder="Search..." #searchInput />
         </div>
         <div>
             <button (click)="goToNewBookPage()">Add a book</button>
