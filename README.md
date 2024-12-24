@@ -12,6 +12,11 @@
 * PostgreSQL 14
 * Node.js & npm
 
+## Project structure:
+
+* Backend: `src/main/java`
+* Frontend: `src/main/webapp`
+
 ## Configuration:
 
 * Files can be found in `src/main/resources` directory
