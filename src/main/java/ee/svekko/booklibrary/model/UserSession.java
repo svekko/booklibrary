@@ -11,7 +11,7 @@ public record UserSession(int id) {
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
 
-        if (authentication.getDetails() instanceof UserSession userSession) {
+        if (authentication != null && authentication.getDetails() instanceof UserSession userSession) {
             return userSession;
         }
 

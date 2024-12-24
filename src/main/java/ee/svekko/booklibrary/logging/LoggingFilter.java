@@ -22,7 +22,7 @@ public class LoggingFilter implements Filter {
             SecurityContext context = SecurityContextHolder.getContext();
             Authentication authentication = context.getAuthentication();
 
-            if (authentication.getDetails() instanceof UserSession userSession) {
+            if (authentication != null && authentication.getDetails() instanceof UserSession userSession) {
                 log.info("New {} request to {} (user id: {})", servletRequest.getMethod(), servletRequest.getRequestURI(), userSession.id());
             } else {
                 log.info("New {} request to {}", servletRequest.getMethod(), servletRequest.getRequestURI());
