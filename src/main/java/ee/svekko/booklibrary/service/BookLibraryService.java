@@ -33,7 +33,7 @@ public class BookLibraryService {
     }
 
     @Transactional
-    public void addBook(UserAccount userAccount, AddBookRequestDto requestDto) {
+    public int addBook(UserAccount userAccount, AddBookRequestDto requestDto) {
         if (bookChangeRepository.getBookByTitle(requestDto.getTitle()).isPresent()) {
             throw new InvalidDataException(InvalidDataError.BOOK_MUST_HAVE_UNIQUE_TITLE);
         }
@@ -48,6 +48,8 @@ public class BookLibraryService {
             .validFrom(LocalDateTime.now())
             .validTo(TimeUtil.maxDateTime())
             .build());
+
+        return book.getId();
     }
 
     @Transactional
