@@ -30,3 +30,7 @@
 * Run `npm install`
 * Run `ng serve`
 * Open `http://localhost:4200` in your browser
+
+## Swagger:
+
+* Can be accessed from `http://localhost:8080/swagger-ui/index.html`

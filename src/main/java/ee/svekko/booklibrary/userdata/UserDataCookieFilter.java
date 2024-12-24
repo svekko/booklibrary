@@ -16,8 +16,8 @@ public class UserDataCookieFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (response instanceof HttpServletResponse) {
-            userDataCookieService.setUserDataCookie((HttpServletResponse) response);
+        if (response instanceof HttpServletResponse servletResponse) {
+            userDataCookieService.setUserDataCookie(servletResponse);
         }
 
         chain.doFilter(request, response);
