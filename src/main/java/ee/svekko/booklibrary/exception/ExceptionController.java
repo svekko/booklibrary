@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -15,6 +16,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
 public class ExceptionController {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<JsonResponseDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.error(e.getMessage());
+        JsonResponseDto responseDto = JsonResponseDto.error("Invalid form data");
+        return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(InvalidDataException.class)
     public ResponseEntity<JsonResponseDto> handleBadRequestException(InvalidDataException e) {
         log.error(e.getMessage());
